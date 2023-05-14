@@ -1,4 +1,6 @@
-# Hello AVR
+# Arduino Nano LED Chaser
+
+Basic Arduino project that displays a rotating pattern on some LEDs.
 
 ## Useful Commands
 
