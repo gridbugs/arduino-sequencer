@@ -63,9 +63,9 @@ int main(void) {
     DDRD = 0xFF;
     int indices[N_INDICES] = {0, 5, 10};
     while (1) {
-        PORTB = 0x0;
-        PORTC = 0x0;
-        PORTD = 0x0;
+        PORTB = 0;
+        PORTC = 0;
+        PORTD = 0;
         for (int i = 0; i < N_INDICES; i++) {
             led_on(leds[indices[i]]);
             indices[i] = (indices[i] + 1) % N_LEDS;
