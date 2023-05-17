@@ -50,7 +50,7 @@ led_t leds[N_LEDS] = {
 };
 
 void led_on(led_t led) {
-    *led.port = 1 << led.bit;
+    *led.port |= 1 << led.bit;
 }
 
 #define N_INDICES 3
