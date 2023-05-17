@@ -25,13 +25,14 @@ void USART0_init( void ) {
     stdout = &uartout;
 }
 
+// Represents a single I/O-Port pin
 typedef struct {
-    volatile uint8_t* port;
-    uint8_t bit;
+    volatile uint8_t* port; // pointer to the port's register
+    uint8_t bit; // (0 to 7) which bit in the register the port corresponds to
 } led_t;
 
-#define N_LEDS 15
-led_t leds[N_LEDS] = {
+// List out each pin with an attached LED in the order we want them to flash
+led_t leds[] = {
     { .port = &PORTD, .bit = 7 },
     { .port = &PORTD, .bit = 6 },
     { .port = &PORTD, .bit = 5 },
@@ -49,31 +50,50 @@ led_t leds[N_LEDS] = {
     { .port = &PORTC, .bit = 0 },
 };
 
+// The number of LEDs
+#define N_LEDS (sizeof(leds) / sizeof(led_t))
+
+// Turn on a single LED without affecting the state of the other LEDs
 void led_on(led_t led) {
     *led.port |= 1 << led.bit;
 }
 
-#define N_INDICES 3
-
 int main(void) {
     USART0_init();
     printf("Hello, World!\r\n");
+
+    // Set the data direction for each I/O-Port pin to "output".
+    // Each DDRx register controls whether each pin in I/O-Port x is
+    // an input pin (0) or an output pin (1).
     DDRB = 0xFF;
     DDRC = 0xFF;
     DDRD = 0xFF;
-    int indices[N_INDICES] = {0, 5, 10};
+
+    // The starting points for the indices into the global `leds` array
+    // that will be on. We'll have 3 lights on at a time in a rotating
+    // pattern, evenly spaced out.
+    int indices[] = {0, 5, 10};
+
     while (1) {
+
+        // Briefly turn off all the LEDs
         PORTB = 0;
         PORTC = 0;
         PORTD = 0;
-        for (int i = 0; i < N_INDICES; i++) {
+
+        // Turn on just the pins at the indices, and increment each index
+        // wrapping around at N_LEDS
+        for (int i = 0; i < (sizeof(indices) / sizeof(indices[0])); i++) {
             led_on(leds[indices[i]]);
             indices[i] = (indices[i] + 1) % N_LEDS;
         }
+
+        // Wait for a short amount of time before progressing
         uint32_t delay = 100000;
         while (delay > 0) {
             delay -= 1;
         }
     }
+
     return 0;
 }
