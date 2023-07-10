@@ -1,4 +1,4 @@
-TARGET=hello
+TARGET=main
 
 SRC=main.c
 OBJ=$(SRC:.c=.o)
@@ -9,7 +9,7 @@ MCU=atmega328p
 # The --param=min-pagesize=0 argument is to fix the error:
 # error: array subscript 0 is outside array bounds of ‘volatile uint8_t[0]’ {aka ‘volatile unsigned char[]’}
 # ...which is incorrectly reported in some versions of gcc
-CFLAGS=-mmcu=$(MCU) -std=c99 -Werror -Wall --param=min-pagesize=0
+CFLAGS=-mmcu=$(MCU) -std=c99 -Werror -Wall --param=min-pagesize=0 -O1
 
 TOOLS_DIR=tools
 COMPILE_COMMANDS=compile_commands.json
