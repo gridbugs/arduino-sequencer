@@ -1,6 +1,4 @@
-# Arduino Nano LED Chaser
-
-Basic Arduino project that displays a rotating pattern on some LEDs.
+# Arduino-based 16-step Sequencer
 
 ## Useful Commands
 
@@ -13,6 +11,3 @@ make && sudo avrdude -P /dev/ttyUSB0 -c arduino -p m328p -U flash:w:main.elf
 ```
 sudo picocom -b9600 /dev/ttyUSB0
 ```
-
-## Circuit Diagram
-![Circuit Diagram](/circuit.jpg)

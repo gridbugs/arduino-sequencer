@@ -1,3 +1,4 @@
+#include "stdint.h"
 #include <stdio.h>
 #include <avr/io.h>
 
@@ -25,27 +26,62 @@ void USART0_init( void ) {
     stdout = &uartout;
 }
 
+void ADC_init(void) {
+    PRR &= ~(1 << PRADC); // disable power reduction ADC bit
+    ADCSRA = (1 << ADEN); // enable the ADC
+    DIDR0 = 0xFF; // enable all the ADC pins
+}
+
+void ADC_set_channel(uint8_t channel) {
+    ADMUX = (1 << REFS0) | channel;
+}
+
+void ADC_start_read(void) {
+    ADCSRA |= (1 << ADSC); // start the conversion
+}
+
+uint16_t ADC_complete_read(void) {
+    while ((ADCSRA & (1 << ADSC)) != 0); // wait for the start bit to clear
+    uint16_t lo = (uint16_t)ADCL;
+    uint16_t hi = (uint16_t)ADCH << 8;;
+    return hi | lo;
+}
+
+uint16_t ADC_read(uint8_t channel) {
+    ADC_set_channel(channel);
+    ADC_start_read();
+    return ADC_complete_read();
+}
+
+uint16_t ADC_read_discarding_first(uint8_t channel) {
+    ADC_read(channel);
+    return ADC_read(channel);
+}
+
 int main(void) {
     USART0_init();
     printf("Hello, World!\r\n");
 
     DDRB = 0xFF;
-    DDRC = 0xFF;
     DDRD = 0xFF;
+
+    ADC_init();
 
     uint8_t index = 0;
 
     while (1) {
-    printf("%d\r\n", index);
-
-        // Briefly turn off all the LEDs
+        uint32_t note_duration = ((uint32_t)ADC_read_discarding_first(6)) >> 7;
+        uint32_t gate_up_duration = ((uint32_t)ADC_read_discarding_first(7)) >> 7;
         PORTB = index;
-
         index = (index + 1) % 16;
-
-        uint32_t delay2 = 100000;
-        while (delay2 > 0) {
-            delay2 -= 1;
+        uint32_t time = 0;
+        PORTB |= (1 << 4);
+        while (time < gate_up_duration) {
+            time += 1;
+        }
+        PORTB &= ~(1 << 4);
+        while (time < note_duration) {
+            time += 1;
         }
     }
 
