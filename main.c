@@ -70,8 +70,8 @@ int main(void) {
     uint8_t index = 0;
 
     while (1) {
-        uint32_t note_duration = ((uint32_t)ADC_read_discarding_first(6)) >> 7;
-        uint32_t gate_up_duration = ((uint32_t)ADC_read_discarding_first(7)) >> 7;
+        uint32_t note_duration = ((uint32_t)ADC_read_discarding_first(6)) << 10;
+        uint32_t gate_up_duration = (((uint32_t)ADC_read_discarding_first(7)) * note_duration) >> 10;
         PORTB = index;
         index = (index + 1) % 16;
         uint32_t time = 0;
